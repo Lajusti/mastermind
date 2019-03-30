@@ -1,0 +1,98 @@
+buildscript {
+	ext {
+		springBootVersion = '2.1.2.RELEASE'
+	}
+	repositories {
+		mavenCentral()
+	}
+	dependencies {
+		classpath("org.springframework.boot:spring-boot-gradle-plugin:${springBootVersion}")
+	}
+}
+
+apply plugin: 'jacoco'
+apply plugin: 'java'
+apply plugin: 'org.springframework.boot'
+
+group = 'alejandro.lajusticia'
+version = '0.0.1'
+
+sourceCompatibility = '1.8'
+
+sourceSets {
+	functionalTest {
+		java {
+			srcDir 'src/functionalTest/java'
+			compileClasspath += main.output + test.output
+			runtimeClasspath += main.output + test.output
+		}
+		resources {
+			srcDir 'src/functionalTest/resources'
+		}
+	}
+}
+
+repositories {
+	mavenCentral()
+}
+
+task functionalTest(type: Test) {
+	testClassesDirs = sourceSets.functionalTest.output.classesDirs
+	classpath = sourceSets.functionalTest.runtimeClasspath
+}
+
+test {
+	useJUnitPlatform()
+}
+
+jacoco {
+	toolVersion = "0.8.1"
+	reportsDir = file("$buildDir/jacocoReportDir")
+}
+
+jacocoTestReport {
+	reports {
+		html.destination file("${buildDir}/jacocoHtml")
+	}
+
+	afterEvaluate {
+		classDirectories = files(classDirectories.files.collect {
+			fileTree(dir: it,
+					exclude: [
+							'alejandro/lajusticia/mastermind/MastermindApplication**'
+					]
+			)
+		})
+	}
+}
+
+configurations {
+	functionalTestImplementation.extendsFrom testImplementation
+	functionalTestCompile.extendsFrom testCompile
+}
+
+check.dependsOn functionalTest
+functionalTest.mustRunAfter test
+
+dependencies {
+	implementation(
+			"org.springframework.boot:spring-boot-starter-web:${springBootVersion}",
+			"org.springframework.boot:spring-boot-starter-data-jpa:${springBootVersion}",
+			"org.springframework.boot:spring-boot-starter-actuator:${springBootVersion}",
+	)
+
+	compile(
+			"io.springfox:springfox-swagger2:2.8.0",
+			"io.springfox:springfox-swagger-ui:2.8.0",
+			"org.projectlombok:lombok:1.18.4",
+			"com.h2database:h2:1.4.197"
+	)
+
+	testImplementation (
+			"org.springframework.boot:spring-boot-starter-test:${springBootVersion}",
+			"org.junit.jupiter:junit-jupiter-api:5.1.0",
+			"org.junit.jupiter:junit-jupiter-engine:5.1.0",
+			"org.mockito:junit-jupiter:2.20.0"
+	)
+
+}
