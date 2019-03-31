@@ -1,13 +1,10 @@
 package alejandro.lajusticia.mastermind.game.domain.model;
 
-import alejandro.lajusticia.mastermind.game.domain.model.exception.EmptySecretException;
-import alejandro.lajusticia.mastermind.game.domain.model.exception.GameIsOverException;
-import alejandro.lajusticia.mastermind.game.domain.model.exception.WrongNumberOfAttemptsException;
+import alejandro.lajusticia.mastermind.game.domain.model.exception.*;
 import lombok.Getter;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.UUID;
 
 @Getter
 public class Game {
@@ -17,9 +14,13 @@ public class Game {
     private final int maxAttempts;
     private List<Attempt> attempts = new ArrayList<>();
 
-    public Game(final List<GuessBall> secret, final int maxAttempts)
-            throws WrongNumberOfAttemptsException, EmptySecretException
+    public Game(final String uuid, final List<GuessBall> secret, final int maxAttempts)
+            throws EmptySecretException, WrongNumberOfAttemptsException, EmptyUUIDException
     {
+        if (uuid == null || uuid.isEmpty()) {
+            throw new EmptyUUIDException();
+        }
+
         if (secret == null || secret.isEmpty()) {
             throw new EmptySecretException();
         }
@@ -28,14 +29,18 @@ public class Game {
             throw new WrongNumberOfAttemptsException(maxAttempts);
         }
 
-        uuid = UUID.randomUUID().toString();
+        this.uuid = uuid;
         this.secret = secret;
         this.maxAttempts = maxAttempts;
     }
 
-    public void addAttempt(Attempt attempt) throws GameIsOverException {
+    public void addAttempt(Attempt attempt) throws GameIsOverException, GameIsSolvedException {
         if (attempts.size() == maxAttempts) {
             throw new GameIsOverException();
+        }
+
+        if (isSolved()) {
+            throw new GameIsSolvedException();
         }
 
         attempts.add(attempt);

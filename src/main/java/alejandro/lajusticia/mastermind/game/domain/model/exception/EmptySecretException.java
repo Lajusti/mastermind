@@ -2,7 +2,7 @@ package alejandro.lajusticia.mastermind.game.domain.model.exception;
 
 public class EmptySecretException extends ModelException {
 
-    private final static String MESSAGE = "The secret of game can not be empty.";
+    private static final String MESSAGE = "The secret of game can not be empty.";
 
     public EmptySecretException() {
         super(MESSAGE);

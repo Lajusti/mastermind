@@ -3,7 +3,7 @@ package alejandro.lajusticia.mastermind.game.domain.model;
 import lombok.Getter;
 
 @Getter
-abstract class Ball {
+public abstract class Ball {
 
     private final String color;
 
