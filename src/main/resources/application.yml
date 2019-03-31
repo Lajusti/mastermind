@@ -1,0 +1,29 @@
+# Server configuration
+server:
+  port : 80
+
+# Spring configuration
+spring:
+  # Datasource configuration
+  datasource:
+    url: jdbc:h2:file:~/matermind-db
+    username: sa
+    password:
+    driver-class-name: org.h2.Driver
+
+  # Only validate the current model of database the modifications are controlled by liquibase
+  jpa:
+    hibernate:
+      ddl-auto: validate
+
+  # To access to the database use: http:localhost/h2
+  h2:
+    console:
+      enabled: true
+      path: /h2
+
+  # Liquibase configuration
+  liquibase:
+    change-log: classpath:/db/changelog/db.changelog-master.yaml
+
+

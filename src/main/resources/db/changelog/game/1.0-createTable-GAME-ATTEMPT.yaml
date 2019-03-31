@@ -1,0 +1,55 @@
+# changelog for creation of the tables GAME and ATTEMPT
+
+databaseChangeLog:
+  - changeSet:
+      id: game 1.0
+      author: alejandro.lajusticia
+      changes:
+
+        # Table: GAME
+        - createTable:
+            tableName: game
+            columns:
+              - column:
+                  name: id
+                  type: varchar(255)
+                  constraints:
+                    primaryKey: true
+                    nullable: false
+              - column:
+                  name: max_attempts
+                  type: int
+                  constraints:
+                    nullable: false
+              - column:
+                  name: secret
+                  type: varchar(1024)
+                  constraints:
+                    nullable: false
+
+        # Table: ATTEMPT
+        - createTable:
+            tableName: attempt
+            columns:
+              - column:
+                  name: id
+                  type: bigint
+                  constraints:
+                    primaryKey: true
+                    nullable: false
+              - column:
+                  name: input
+                  type: varchar(1024)
+                  constraints:
+                    nullable: false
+              - column:
+                  name: feedback
+                  type: varchar(1024)
+                  constraints:
+                    nullable: false
+              - column:
+                  name: game_id
+                  type: varchar(255)
+                  constraints:
+                    nullable: false
+

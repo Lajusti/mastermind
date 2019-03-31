@@ -2,9 +2,10 @@ package alejandro.lajusticia.mastermind.game.domain.service;
 
 import alejandro.lajusticia.mastermind.game.domain.model.Game;
 import alejandro.lajusticia.mastermind.game.domain.model.GuessBall;
-import alejandro.lajusticia.mastermind.game.domain.model.exception.*;
+import alejandro.lajusticia.mastermind.game.domain.model.exception.ModelException;
 import alejandro.lajusticia.mastermind.game.domain.service.exception.GameNotFoundException;
 import alejandro.lajusticia.mastermind.game.domain.service.exception.WrongAttemptLengthException;
+import alejandro.lajusticia.mastermind.game.infrastructure.repository.db.exception.RepositoryException;
 
 import java.util.List;
 
@@ -25,11 +26,12 @@ public interface GameService {
      * @param id of the game to obtain
      * @return the Game with the id
      * @throws GameNotFoundException if the game with the id is not in our system
+     * @throws RepositoryException if the data in the repository is wrong
      */
-    Game getGame(String id) throws GameNotFoundException;
+    Game getGame(String id) throws GameNotFoundException, RepositoryException;
 
     /**
-     * add attempt to game from the input of the attempt
+     * Add attempt to game from the input of the attempt
      *
      * @param id of the game to add the attempt
      * @param attemptInput input of the attempt with the list of GuessBalls
@@ -37,8 +39,9 @@ public interface GameService {
      * @throws GameNotFoundException if the game with the id is not in our system
      * @throws WrongAttemptLengthException if the length of the attemptInput is wrong
      * @throws ModelException if some data is wrong
+     * @throws RepositoryException if the data in the repository is wrong
      */
     Game addAttemptToGameByGameIdAndAttemptInput(String id, List<GuessBall> attemptInput)
-            throws GameNotFoundException, WrongAttemptLengthException, ModelException;
+            throws GameNotFoundException, WrongAttemptLengthException, ModelException, RepositoryException;
 
 }

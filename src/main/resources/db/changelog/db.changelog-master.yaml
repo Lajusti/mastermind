@@ -1,0 +1,12 @@
+databaseChangeLog:
+  - changeSet:
+      id: createSequence-hibernate
+      author: alejandro.lajusticia
+      changes:
+        - createSequence:
+            incrementBy: 1
+            sequenceName: hibernate_sequence
+  - include:
+      - file: db/changelog/game/1.0-createTable-GAME-ATTEMPT.yaml
+  - include:
+      - file: db/changelog/game/1.1-addForeignKeyConstraint-GAME-ATTEMPT.yaml

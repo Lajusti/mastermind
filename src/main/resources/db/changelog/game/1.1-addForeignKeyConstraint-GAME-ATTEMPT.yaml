@@ -1,0 +1,15 @@
+# changelog for creation the relationship of the table: ATTEMPT
+
+databaseChangeLog:
+  - changeSet:
+      id: game 1.1
+      author: alejandro.lajusticia
+      changes:
+
+        # attempt (0 <-> n) game
+        - addForeignKeyConstraint:
+            baseColumnNames: game_id
+            baseTableName: attempt
+            constraintName: fk_attempt_game
+            referencedColumnNames: id
+            referencedTableName: game

@@ -6,12 +6,14 @@ import alejandro.lajusticia.mastermind.game.domain.model.Attempt;
 import alejandro.lajusticia.mastermind.game.domain.model.FeedbackBall;
 import alejandro.lajusticia.mastermind.game.domain.model.Game;
 import alejandro.lajusticia.mastermind.game.domain.model.GuessBall;
-import alejandro.lajusticia.mastermind.game.domain.model.exception.*;
+import alejandro.lajusticia.mastermind.game.domain.model.exception.ModelException;
 import alejandro.lajusticia.mastermind.game.domain.service.AttemptService;
 import alejandro.lajusticia.mastermind.game.domain.service.GuessBallService;
 import alejandro.lajusticia.mastermind.game.domain.service.exception.GameNotFoundException;
 import alejandro.lajusticia.mastermind.game.domain.service.exception.WrongAttemptLengthException;
 import alejandro.lajusticia.mastermind.game.infrastructure.repository.GameRepository;
+import alejandro.lajusticia.mastermind.game.infrastructure.repository.db.exception.GameUnavailableException;
+import alejandro.lajusticia.mastermind.game.infrastructure.repository.db.exception.RepositoryException;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -100,8 +102,7 @@ class GameServiceImplTest {
 
     @Test
     void getGame_OK()
-            throws EmptySecretException, WrongNumberOfAttemptsException, EmptyUUIDException, GameNotFoundException
-    {
+            throws ModelException, RepositoryException, GameNotFoundException {
         String id = "EXPECTED_ID";
 
         when(repository.findGameById(id))
@@ -120,7 +121,7 @@ class GameServiceImplTest {
     }
 
     @Test
-    void getGame_KO() {
+    void getGame_KO_GameNotFoundException() throws GameUnavailableException {
         String id = "EXPECTED_ID";
 
         when(repository.findGameById(id))
@@ -136,8 +137,24 @@ class GameServiceImplTest {
     }
 
     @Test
+    void getGame_KO_RepositoryException() throws RepositoryException {
+        String id = "EXPECTED_ID";
+
+        when(repository.findGameById(id))
+                .thenThrow(new GameUnavailableException());
+
+        Assertions.assertThrows(
+                GameUnavailableException.class,
+                () -> gameService.getGame(id)
+        );
+
+        verify(repository, times(1))
+                .findGameById(id);
+    }
+
+    @Test
     void addAttemptToGameByGameIdAndAttemptInput_OK()
-            throws ModelException, WrongAttemptLengthException, GameNotFoundException {
+            throws ModelException, WrongAttemptLengthException, GameNotFoundException, RepositoryException {
         String id = "EXPECTED_ID";
         List<FeedbackBall> expectedFeedBack = Arrays.asList(
                 new FeedbackBall(FeedbackColor.BLACK),
@@ -172,7 +189,9 @@ class GameServiceImplTest {
     }
 
     @Test
-    void addAttemptToGameByGameIdAndAttemptInput_KO_WrongAttemptLengthException() throws ModelException {
+    void addAttemptToGameByGameIdAndAttemptInput_KO_WrongAttemptLengthException()
+            throws ModelException, GameUnavailableException
+    {
         String id = "EXPECTED_ID";
         List<GuessBall> wrongSecret = Arrays.asList(
                 new GuessBall(GuessColor.BLUE),
@@ -218,21 +237,40 @@ class GameServiceImplTest {
     }
 
     @Test
-    void addAttemptToGameByGameIdAndAttemptInput_KO_GameNotFoundException() throws ModelException
+    void addAttemptToGameByGameIdAndAttemptInput_KO_GameNotFoundException()
+            throws ModelException, GameUnavailableException
     {
         String id = "EXPECTED_ID";
-        List<FeedbackBall> expectedFeedBack = Arrays.asList(
-                new FeedbackBall(FeedbackColor.BLACK),
-                new FeedbackBall(FeedbackColor.BLACK),
-                new FeedbackBall(FeedbackColor.BLACK),
-                new FeedbackBall(FeedbackColor.BLACK)
-        );
 
         when(repository.findGameByIdAndLock(id))
                 .thenReturn(Optional.empty());
 
         Assertions.assertThrows(
                 GameNotFoundException.class,
+                () -> gameService.addAttemptToGameByGameIdAndAttemptInput(id, EXPECTED_SECRET)
+        );
+
+        verify(repository, times(1))
+                .findGameByIdAndLock(id);
+
+        verify(attemptService, times(0))
+                .createAttemptFromSecretAndAttemptInput(EXPECTED_SECRET, EXPECTED_SECRET);
+
+        verify(repository, times(0))
+                .saveAttemptToGame(any(), any());
+    }
+
+    @Test
+    void addAttemptToGameByGameIdAndAttemptInput_KO_RepositoryException()
+            throws ModelException, GameUnavailableException
+    {
+        String id = "EXPECTED_ID";
+
+        when(repository.findGameByIdAndLock(id))
+                .thenThrow(new GameUnavailableException());
+
+        Assertions.assertThrows(
+                RepositoryException.class,
                 () -> gameService.addAttemptToGameByGameIdAndAttemptInput(id, EXPECTED_SECRET)
         );
 

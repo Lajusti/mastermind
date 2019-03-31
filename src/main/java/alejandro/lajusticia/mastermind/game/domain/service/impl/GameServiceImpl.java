@@ -10,6 +10,7 @@ import alejandro.lajusticia.mastermind.game.domain.service.GuessBallService;
 import alejandro.lajusticia.mastermind.game.domain.service.exception.GameNotFoundException;
 import alejandro.lajusticia.mastermind.game.domain.service.exception.WrongAttemptLengthException;
 import alejandro.lajusticia.mastermind.game.infrastructure.repository.GameRepository;
+import alejandro.lajusticia.mastermind.game.infrastructure.repository.db.exception.RepositoryException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -48,7 +49,7 @@ public class GameServiceImpl implements GameService {
     }
 
     @Override
-    public Game getGame(String id) throws GameNotFoundException {
+    public Game getGame(String id) throws GameNotFoundException, RepositoryException {
         return repository.findGameById(id)
                 .orElseThrow(() -> new GameNotFoundException(id));
     }
@@ -56,7 +57,7 @@ public class GameServiceImpl implements GameService {
     @Override
     @Transactional
     public Game addAttemptToGameByGameIdAndAttemptInput(String id, List<GuessBall> attemptInput)
-            throws ModelException, WrongAttemptLengthException, GameNotFoundException {
+            throws ModelException, WrongAttemptLengthException, GameNotFoundException, RepositoryException {
         if (attemptInput.size() != SECRET_LENGTH) {
             throw new WrongAttemptLengthException(SECRET_LENGTH);
         }
@@ -69,7 +70,7 @@ public class GameServiceImpl implements GameService {
         return game;
     }
 
-    private Game getGameAndLock(String id) throws GameNotFoundException {
+    private Game getGameAndLock(String id) throws GameNotFoundException, RepositoryException {
         return repository.findGameByIdAndLock(id)
                 .orElseThrow(() -> new GameNotFoundException(id));
     }

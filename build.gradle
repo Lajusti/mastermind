@@ -60,7 +60,8 @@ jacocoTestReport {
 			fileTree(dir: it,
 					exclude: [
 							'alejandro/lajusticia/mastermind/MastermindApplication**',
-							'alejandro/lajusticia/mastermind/config**'
+							'alejandro/lajusticia/mastermind/config**',
+							'alejandro/lajusticia/mastermind/game/infrastructure/repository/db/entity**'
 					]
 			)
 		})
@@ -86,7 +87,8 @@ dependencies {
 			"io.springfox:springfox-swagger2:2.8.0",
 			"io.springfox:springfox-swagger-ui:2.8.0",
 			"org.projectlombok:lombok:1.18.4",
-			"com.h2database:h2:1.4.197"
+			"com.h2database:h2:1.4.197",
+			"org.liquibase:liquibase-core:3.6.3"
 	)
 
 	testImplementation (
