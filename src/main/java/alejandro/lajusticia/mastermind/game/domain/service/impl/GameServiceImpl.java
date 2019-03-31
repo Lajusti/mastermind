@@ -10,7 +10,7 @@ import alejandro.lajusticia.mastermind.game.domain.service.GuessBallService;
 import alejandro.lajusticia.mastermind.game.domain.service.exception.GameNotFoundException;
 import alejandro.lajusticia.mastermind.game.domain.service.exception.WrongAttemptLengthException;
 import alejandro.lajusticia.mastermind.game.infrastructure.repository.GameRepository;
-import alejandro.lajusticia.mastermind.game.infrastructure.repository.db.exception.RepositoryException;
+import alejandro.lajusticia.mastermind.game.infrastructure.repository.exception.RepositoryException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 

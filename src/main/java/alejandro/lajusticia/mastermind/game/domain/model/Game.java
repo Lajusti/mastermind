@@ -5,6 +5,7 @@ import lombok.Getter;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 @Getter
 public class Game {
@@ -56,6 +57,14 @@ public class Game {
 
     public boolean isEnded() {
         return maxAttempts == attempts.size();
+    }
+
+    public Optional<Attempt> getLastAttempt() {
+        if (attempts.isEmpty()) {
+            return Optional.empty();
+        }
+
+        return Optional.of(attempts.get(attempts.size() - 1));
     }
 
 }

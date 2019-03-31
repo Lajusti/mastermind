@@ -1,4 +1,4 @@
-package alejandro.lajusticia.mastermind.game.infrastructure.repository.db.exception;
+package alejandro.lajusticia.mastermind.game.infrastructure.repository.exception;
 
 public abstract class RepositoryException extends Exception {
 

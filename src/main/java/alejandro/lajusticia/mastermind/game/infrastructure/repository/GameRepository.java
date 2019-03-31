@@ -2,7 +2,7 @@ package alejandro.lajusticia.mastermind.game.infrastructure.repository;
 
 import alejandro.lajusticia.mastermind.game.domain.model.Attempt;
 import alejandro.lajusticia.mastermind.game.domain.model.Game;
-import alejandro.lajusticia.mastermind.game.infrastructure.repository.db.exception.GameUnavailableException;
+import alejandro.lajusticia.mastermind.game.infrastructure.repository.exception.GameUnavailableException;
 
 import java.util.Optional;
 

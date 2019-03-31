@@ -6,7 +6,7 @@ import alejandro.lajusticia.mastermind.game.domain.model.exception.ModelExceptio
 import alejandro.lajusticia.mastermind.game.infrastructure.repository.GameRepository;
 import alejandro.lajusticia.mastermind.game.infrastructure.repository.db.entity.AttemptEntity;
 import alejandro.lajusticia.mastermind.game.infrastructure.repository.db.entity.GameEntity;
-import alejandro.lajusticia.mastermind.game.infrastructure.repository.db.exception.GameUnavailableException;
+import alejandro.lajusticia.mastermind.game.infrastructure.repository.exception.GameUnavailableException;
 import alejandro.lajusticia.mastermind.game.infrastructure.repository.db.jpa.AttemptJpaRepository;
 import alejandro.lajusticia.mastermind.game.infrastructure.repository.db.jpa.GameJpaRepository;
 import alejandro.lajusticia.mastermind.game.infrastructure.repository.db.mapper.AttemptEntityDomainMapper;

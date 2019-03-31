@@ -170,5 +170,15 @@ class GameTest {
         assertTrue(game.isEnded());
     }
 
+    @Test
+    void getLastAttempt_OK() throws ModelException {
+        Game game = new Game(EXPECTED_UUID, EXPECTED_SECRET, 1);
+        assertFalse(game.getLastAttempt().isPresent());
+
+        game.addAttempt(attempt);
+
+        assertTrue(game.getLastAttempt().isPresent());
+        assertEquals(attempt, game.getLastAttempt().get());
+    }
 
 }

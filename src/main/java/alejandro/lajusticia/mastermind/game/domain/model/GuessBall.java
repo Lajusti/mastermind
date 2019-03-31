@@ -1,9 +1,11 @@
 package alejandro.lajusticia.mastermind.game.domain.model;
 
 import alejandro.lajusticia.mastermind.game.domain.enumeration.GuessColor;
+import lombok.ToString;
 
 import java.util.Objects;
 
+@ToString
 public class GuessBall extends Ball {
 
     private final GuessColor guessColor;
@@ -11,6 +13,11 @@ public class GuessBall extends Ball {
     public GuessBall(final GuessColor color) {
         super(color.name());
         guessColor = color;
+    }
+
+    public GuessBall(final String color) {
+        super(color);
+        guessColor = GuessColor.valueOf(color);
     }
 
     @Override

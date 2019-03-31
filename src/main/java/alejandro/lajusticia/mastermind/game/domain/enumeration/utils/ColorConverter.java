@@ -75,6 +75,27 @@ public class ColorConverter {
         return feedbackBallsAsString.toString();
     }
 
+    public static List<GuessBall> convertGuessStringToGuessBall(List<String> guessAsString) {
+        List<GuessBall> guessBalls = new ArrayList<>();
+        guessAsString.forEach(
+                elementAsString -> guessBalls.add(
+                        new GuessBall(elementAsString)
+                )
+        );
+        return guessBalls;
+    }
+
+    public static String getAllColorAvailable() {
+        StringBuilder colors = new StringBuilder();
+        for (GuessColor color : GuessColor.values()) {
+            if (colors.length() > 0) {
+                colors.append(", ");
+            }
+            colors.append(color.name());
+        }
+        return colors.toString();
+    }
+
     private ColorConverter() {
 
     }

@@ -5,7 +5,7 @@ import alejandro.lajusticia.mastermind.game.domain.model.GuessBall;
 import alejandro.lajusticia.mastermind.game.domain.model.exception.ModelException;
 import alejandro.lajusticia.mastermind.game.domain.service.exception.GameNotFoundException;
 import alejandro.lajusticia.mastermind.game.domain.service.exception.WrongAttemptLengthException;
-import alejandro.lajusticia.mastermind.game.infrastructure.repository.db.exception.RepositoryException;
+import alejandro.lajusticia.mastermind.game.infrastructure.repository.exception.RepositoryException;
 
 import java.util.List;
 

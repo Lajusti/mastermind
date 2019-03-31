@@ -9,7 +9,7 @@ import alejandro.lajusticia.mastermind.game.domain.model.GuessBall;
 import alejandro.lajusticia.mastermind.game.domain.model.exception.*;
 import alejandro.lajusticia.mastermind.game.infrastructure.repository.db.entity.AttemptEntity;
 import alejandro.lajusticia.mastermind.game.infrastructure.repository.db.entity.GameEntity;
-import alejandro.lajusticia.mastermind.game.infrastructure.repository.db.exception.GameUnavailableException;
+import alejandro.lajusticia.mastermind.game.infrastructure.repository.exception.GameUnavailableException;
 import alejandro.lajusticia.mastermind.game.infrastructure.repository.db.impl.GameRepositoryDBImpl;
 import alejandro.lajusticia.mastermind.game.infrastructure.repository.db.jpa.AttemptJpaRepository;
 import alejandro.lajusticia.mastermind.game.infrastructure.repository.db.jpa.GameJpaRepository;
