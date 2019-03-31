@@ -330,11 +330,9 @@ class AttemptControllerTest {
             throws WrongAttemptLengthException, ModelException, RepositoryException, GameNotFoundException
     {
         String expectedId = "ID";
-        int expectedAttempts = 10;
-        Game expectedGame = getExpectedGame(expectedId, expectedAttempts);
 
         when(gameService.addAttemptToGameByGameIdAndAttemptInput(expectedId, EXPECTED_INPUT))
-                .thenReturn(expectedGame);
+                .thenThrow(new NullPointerException());
 
         ResponseEntity responseEntity = attemptController.doAttempts(expectedId, createExpectedAttemptRequest());
 
