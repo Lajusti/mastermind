@@ -36,12 +36,12 @@ Ej body:
 { "maxAttempts": 10 }
 ```
 
-### [GET] localhost/games/{id} - Ver un juego
-El id se obtien como respuesta de la petición de creación de un juego
+### [GET] localhost/games/{gameId} - Ver un juego
+El gameId se obtien como respuesta de la petición de creación de un juego
 
-### [GET] localhost/games/{id}/attempts - Ver todos los intentos de un juego
+### [GET] localhost/games/{gameId}/attempts - Ver todos los intentos de un juego
 
-### [PUT] localhost/games/{id}/attempt - Realizar un intento
+### [PUT] localhost/games/{gameId}/attempt - Realizar un intento
 Ej body: 
 ```
 { "attempt": ["RED", "BLUE", "PURPLE", "RED"] }
