@@ -2,17 +2,16 @@ package alejandro.lajusticia.mastermind.game.applitaction;
 
 import alejandro.lajusticia.mastermind.game.application.controller.AttemptController;
 import alejandro.lajusticia.mastermind.game.application.request.CreationAttemptRequest;
-import alejandro.lajusticia.mastermind.game.application.response.CreationAttemptResponse;
-import alejandro.lajusticia.mastermind.game.application.response.ErrorResponse;
-import alejandro.lajusticia.mastermind.game.application.response.GetAttemptsResponse;
+import alejandro.lajusticia.mastermind.game.application.response.*;
 import alejandro.lajusticia.mastermind.game.domain.enumeration.FeedbackColor;
 import alejandro.lajusticia.mastermind.game.domain.enumeration.GuessColor;
 import alejandro.lajusticia.mastermind.game.domain.model.Attempt;
 import alejandro.lajusticia.mastermind.game.domain.model.FeedbackBall;
 import alejandro.lajusticia.mastermind.game.domain.model.Game;
 import alejandro.lajusticia.mastermind.game.domain.model.GuessBall;
-import alejandro.lajusticia.mastermind.game.domain.model.exception.EmptyUUIDException;
+import alejandro.lajusticia.mastermind.game.domain.model.exception.GameIsOverException;
 import alejandro.lajusticia.mastermind.game.domain.model.exception.ModelException;
+import alejandro.lajusticia.mastermind.game.domain.model.exception.NullFeedbackException;
 import alejandro.lajusticia.mastermind.game.domain.service.GameService;
 import alejandro.lajusticia.mastermind.game.domain.service.exception.GameNotFoundException;
 import alejandro.lajusticia.mastermind.game.domain.service.exception.WrongAttemptLengthException;
@@ -50,6 +49,13 @@ class AttemptControllerTest {
             new GuessBall(GuessColor.YELLOW),
             new GuessBall(GuessColor.PURPLE),
             new GuessBall(GuessColor.GREEN)
+    );
+
+    private List<GuessBallResponse> EXPECTED_INPUT_RESPONSE = Arrays.asList(
+            new GuessBallResponse(new GuessBall(GuessColor.BLUE)),
+            new GuessBallResponse(new GuessBall(GuessColor.YELLOW)),
+            new GuessBallResponse(new GuessBall(GuessColor.PURPLE)),
+            new GuessBallResponse(new GuessBall(GuessColor.GREEN))
     );
 
     private final List<String> EXPECTED_INPUT_AS_STRING = Arrays.asList(
@@ -241,7 +247,7 @@ class AttemptControllerTest {
         String expectedId = "ID";
 
         when(gameService.addAttemptToGameByGameIdAndAttemptInput(expectedId, EXPECTED_INPUT))
-                .thenThrow(new EmptyUUIDException());
+                .thenThrow(new NullFeedbackException());
 
         ResponseEntity responseEntity = attemptController.doAttempts(expectedId, createExpectedAttemptRequest());
 
@@ -254,6 +260,29 @@ class AttemptControllerTest {
 
         ErrorResponse errorResponse = (ErrorResponse) responseEntity.getBody();
         assertEquals(HttpStatus.BAD_REQUEST.value(), errorResponse.getCode());
+        assertFalse(errorResponse.getDescription().isEmpty());
+    }
+
+    @Test
+    void doAttempts_KO_409_WrongAttemptLengthException()
+            throws WrongAttemptLengthException, ModelException, RepositoryException, GameNotFoundException
+    {
+        String expectedId = "ID";
+
+        when(gameService.addAttemptToGameByGameIdAndAttemptInput(expectedId, EXPECTED_INPUT))
+                .thenThrow(new GameIsOverException());
+
+        ResponseEntity responseEntity = attemptController.doAttempts(expectedId, createExpectedAttemptRequest());
+
+        verify(gameService, times(1))
+                .addAttemptToGameByGameIdAndAttemptInput(expectedId, EXPECTED_INPUT);
+
+        assertEquals(HttpStatus.CONFLICT, responseEntity.getStatusCode());
+        assertNotNull(responseEntity.getBody());
+        assertTrue(responseEntity.getBody() instanceof ErrorResponse);
+
+        ErrorResponse errorResponse = (ErrorResponse) responseEntity.getBody();
+        assertEquals(HttpStatus.CONFLICT.value(), errorResponse.getCode());
         assertFalse(errorResponse.getDescription().isEmpty());
     }
 
@@ -307,9 +336,10 @@ class AttemptControllerTest {
             throws WrongAttemptLengthException, ModelException, RepositoryException, GameNotFoundException
     {
         String expectedId = "ID";
+        int expectedAttempts = 10;
 
         when(gameService.addAttemptToGameByGameIdAndAttemptInput(expectedId, EXPECTED_INPUT))
-                .thenThrow(new GameUnavailableException());
+                .thenReturn(getExpectedGame(expectedId, expectedAttempts));
 
         ResponseEntity responseEntity = attemptController.doAttempts(expectedId, createExpectedAttemptRequest());
 
@@ -352,8 +382,8 @@ class AttemptControllerTest {
         return new Game(id, EXPECTED_SECRET, maxAttempts);
     }
 
-    private void validateAttempt(Attempt attempt) {
-        assertEquals(EXPECTED_INPUT, attempt.getInput());
+    private void validateAttempt(AttemptResponse attempt) {
+        assertEquals(EXPECTED_INPUT_RESPONSE, attempt.getInput());
         assertEquals(2, attempt.getFeedback().size());
         assertEquals(new FeedbackBall(FeedbackColor.BLACK).getColor(), attempt.getFeedback().get(0).getColor());
         assertEquals(new FeedbackBall(FeedbackColor.WHITE).getColor(), attempt.getFeedback().get(1).getColor());

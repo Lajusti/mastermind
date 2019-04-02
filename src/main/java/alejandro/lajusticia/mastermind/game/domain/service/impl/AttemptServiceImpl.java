@@ -5,7 +5,8 @@ import alejandro.lajusticia.mastermind.game.domain.model.Attempt;
 import alejandro.lajusticia.mastermind.game.domain.model.Ball;
 import alejandro.lajusticia.mastermind.game.domain.model.FeedbackBall;
 import alejandro.lajusticia.mastermind.game.domain.model.GuessBall;
-import alejandro.lajusticia.mastermind.game.domain.model.exception.ModelException;
+import alejandro.lajusticia.mastermind.game.domain.model.exception.EmptyInputException;
+import alejandro.lajusticia.mastermind.game.domain.model.exception.NullFeedbackException;
 import alejandro.lajusticia.mastermind.game.domain.service.AttemptService;
 import com.google.common.collect.Lists;
 import org.springframework.stereotype.Service;
@@ -18,7 +19,7 @@ public class AttemptServiceImpl implements AttemptService {
 
     @Override
     public Attempt createAttemptFromSecretAndAttemptInput(List<GuessBall> secret, List<GuessBall> attemptInput)
-            throws ModelException
+            throws EmptyInputException, NullFeedbackException
     {
         List<Ball> secretCopy = Lists.newArrayList(secret);
         List<Ball> attemptCopy = Lists.newArrayList(attemptInput);

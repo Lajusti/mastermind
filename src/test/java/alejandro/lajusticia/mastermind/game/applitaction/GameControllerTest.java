@@ -2,9 +2,7 @@ package alejandro.lajusticia.mastermind.game.applitaction;
 
 import alejandro.lajusticia.mastermind.game.application.controller.GameController;
 import alejandro.lajusticia.mastermind.game.application.request.CreationGameRequest;
-import alejandro.lajusticia.mastermind.game.application.response.CreationGameResponse;
-import alejandro.lajusticia.mastermind.game.application.response.ErrorResponse;
-import alejandro.lajusticia.mastermind.game.application.response.GetGameResponse;
+import alejandro.lajusticia.mastermind.game.application.response.*;
 import alejandro.lajusticia.mastermind.game.domain.enumeration.FeedbackColor;
 import alejandro.lajusticia.mastermind.game.domain.enumeration.GuessColor;
 import alejandro.lajusticia.mastermind.game.domain.model.Attempt;
@@ -44,6 +42,13 @@ class GameControllerTest {
             new GuessBall(GuessColor.RED)
     );
 
+    private final List<GuessBallResponse> EXPECTED_SECRET_RESPONSE = Arrays.asList(
+            new GuessBallResponse(new GuessBall(GuessColor.BLUE)),
+            new GuessBallResponse(new GuessBall(GuessColor.ORANGE)),
+            new GuessBallResponse(new GuessBall(GuessColor.GREEN)),
+            new GuessBallResponse(new GuessBall(GuessColor.RED))
+    );
+
     private List<GuessBall> EXPECTED_INPUT = Arrays.asList(
             new GuessBall(GuessColor.BLUE),
             new GuessBall(GuessColor.YELLOW),
@@ -51,9 +56,23 @@ class GameControllerTest {
             new GuessBall(GuessColor.GREEN)
     );
 
+    private List<GuessBallResponse> EXPECTED_INPUT_RESPONSE = Arrays.asList(
+            new GuessBallResponse(new GuessBall(GuessColor.BLUE)),
+            new GuessBallResponse(new GuessBall(GuessColor.YELLOW)),
+            new GuessBallResponse(new GuessBall(GuessColor.PURPLE)),
+            new GuessBallResponse(new GuessBall(GuessColor.GREEN))
+    );
+
     private final List<FeedbackBall> EXPECTED_FEEDBACK = Arrays.asList(
             new FeedbackBall(FeedbackColor.BLACK),
             new FeedbackBall(FeedbackColor.WHITE)
+    );
+
+    private final List<FeedbackBall> EXPECTED_CORRECT_FEEDBACK = Arrays.asList(
+            new FeedbackBall(FeedbackColor.BLACK),
+            new FeedbackBall(FeedbackColor.BLACK),
+            new FeedbackBall(FeedbackColor.BLACK),
+            new FeedbackBall(FeedbackColor.BLACK)
     );
 
     @Mock
@@ -148,6 +167,86 @@ class GameControllerTest {
         GetGameResponse getGameResponse = (GetGameResponse) response.getBody();
         assertEquals(expectedId, getGameResponse.getId());
         assertEquals(expectedAttempts, getGameResponse.getMaxAttempts());
+        assertFalse(getGameResponse.isSolved());
+        assertFalse(getGameResponse.isEnded());
+        assertEquals(2, getGameResponse.getCurrentAttempt());
+        assertEquals(2, getGameResponse.getAttempts().size());
+
+        validateAttempt(getGameResponse.getAttempts().get(0));
+        validateAttempt(getGameResponse.getAttempts().get(1));
+    }
+
+    @Test
+    void getGame_OK_solved() throws ModelException, RepositoryException, GameNotFoundException {
+        String expectedId = "ID";
+        int expectedAttempts = 10;
+
+        Game expectedGame = getExpectedGame(expectedId, expectedAttempts);
+        expectedGame.addAttempt(new Attempt(EXPECTED_INPUT, EXPECTED_FEEDBACK));
+        expectedGame.addAttempt(new Attempt(EXPECTED_SECRET, EXPECTED_CORRECT_FEEDBACK));
+
+        when(gameService.getGame(expectedId))
+                .thenReturn(expectedGame);
+
+        ResponseEntity response = gameController.getGame(expectedId);
+
+        assertEquals(HttpStatus.OK, response.getStatusCode());
+        assertNotNull(response.getBody());
+        assertTrue(response.getBody() instanceof GetGameResponse);
+
+        GetGameResponse getGameResponse = (GetGameResponse) response.getBody();
+        assertEquals(expectedId, getGameResponse.getId());
+        assertEquals(expectedAttempts, getGameResponse.getMaxAttempts());
+        assertTrue(getGameResponse.isSolved());
+        assertFalse(getGameResponse.isEnded());
+        assertEquals(2, getGameResponse.getCurrentAttempt());
+        assertEquals(2, getGameResponse.getAttempts().size());
+
+        validateAttempt(getGameResponse.getAttempts().get(0));
+
+        assertEquals(EXPECTED_SECRET_RESPONSE, getGameResponse.getAttempts().get(1).getInput());
+        assertEquals(4, getGameResponse.getAttempts().get(1).getFeedback().size());
+        assertEquals(
+                new FeedbackBall(FeedbackColor.BLACK).getColor(),
+                getGameResponse.getAttempts().get(1).getFeedback().get(0).getColor()
+        );
+        assertEquals(
+                new FeedbackBall(FeedbackColor.BLACK).getColor(),
+                getGameResponse.getAttempts().get(1).getFeedback().get(1).getColor()
+        );
+        assertEquals(
+                new FeedbackBall(FeedbackColor.BLACK).getColor(),
+                getGameResponse.getAttempts().get(1).getFeedback().get(2).getColor()
+        );
+        assertEquals(
+                new FeedbackBall(FeedbackColor.BLACK).getColor(),
+                getGameResponse.getAttempts().get(1).getFeedback().get(3).getColor()
+        );
+    }
+
+    @Test
+    void getGame_OK_ended() throws ModelException, RepositoryException, GameNotFoundException {
+        String expectedId = "ID";
+        int expectedAttempts = 2;
+
+        Game expectedGame = getExpectedGame(expectedId, expectedAttempts);
+        expectedGame.addAttempt(new Attempt(EXPECTED_INPUT, EXPECTED_FEEDBACK));
+        expectedGame.addAttempt(new Attempt(EXPECTED_INPUT, EXPECTED_FEEDBACK));
+
+        when(gameService.getGame(expectedId))
+                .thenReturn(expectedGame);
+
+        ResponseEntity response = gameController.getGame(expectedId);
+
+        assertEquals(HttpStatus.OK, response.getStatusCode());
+        assertNotNull(response.getBody());
+        assertTrue(response.getBody() instanceof GetGameResponse);
+
+        GetGameResponse getGameResponse = (GetGameResponse) response.getBody();
+        assertEquals(expectedId, getGameResponse.getId());
+        assertEquals(expectedAttempts, getGameResponse.getMaxAttempts());
+        assertFalse(getGameResponse.isSolved());
+        assertTrue(getGameResponse.isEnded());
         assertEquals(2, getGameResponse.getCurrentAttempt());
         assertEquals(2, getGameResponse.getAttempts().size());
 
@@ -213,8 +312,8 @@ class GameControllerTest {
         return new Game(id, EXPECTED_SECRET, maxAttempts);
     }
 
-    private void validateAttempt(Attempt attempt) {
-        assertEquals(EXPECTED_INPUT, attempt.getInput());
+    private void validateAttempt(AttemptResponse attempt) {
+        assertEquals(EXPECTED_INPUT_RESPONSE, attempt.getInput());
         assertEquals(2, attempt.getFeedback().size());
         assertEquals(new FeedbackBall(FeedbackColor.BLACK).getColor(), attempt.getFeedback().get(0).getColor());
         assertEquals(new FeedbackBall(FeedbackColor.WHITE).getColor(), attempt.getFeedback().get(1).getColor());

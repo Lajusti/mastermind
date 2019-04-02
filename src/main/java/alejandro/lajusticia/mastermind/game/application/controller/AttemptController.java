@@ -1,10 +1,14 @@
 package alejandro.lajusticia.mastermind.game.application.controller;
 
+import alejandro.lajusticia.mastermind.game.application.mapper.AttemptResponseMapper;
 import alejandro.lajusticia.mastermind.game.application.request.CreationAttemptRequest;
 import alejandro.lajusticia.mastermind.game.application.response.CreationAttemptResponse;
+import alejandro.lajusticia.mastermind.game.application.response.FeedbackBallResponse;
 import alejandro.lajusticia.mastermind.game.application.response.GetAttemptsResponse;
 import alejandro.lajusticia.mastermind.game.domain.model.Attempt;
 import alejandro.lajusticia.mastermind.game.domain.model.Game;
+import alejandro.lajusticia.mastermind.game.domain.model.exception.GameIsOverException;
+import alejandro.lajusticia.mastermind.game.domain.model.exception.GameIsSolvedException;
 import alejandro.lajusticia.mastermind.game.domain.model.exception.ModelException;
 import alejandro.lajusticia.mastermind.game.domain.service.GameService;
 import alejandro.lajusticia.mastermind.game.domain.service.exception.GameNotFoundException;
@@ -21,6 +25,7 @@ import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 import static alejandro.lajusticia.mastermind.game.application.utils.ErrorResponseBuilder.buildErrorResponse;
 import static alejandro.lajusticia.mastermind.game.application.utils.ErrorResponseBuilder.buildUnnexpectedError;
@@ -51,7 +56,11 @@ public class AttemptController {
         try {
             Game game = gameService.getGame(id);
             return new ResponseEntity<>(
-                    new GetAttemptsResponse(game.getAttempts()),
+                    new GetAttemptsResponse(
+                            game.getAttempts().stream()
+                                    .map(AttemptResponseMapper::domainToResponse)
+                                    .collect(Collectors.toList())
+                    ),
                     HttpStatus.OK
             );
         } catch (GameNotFoundException e) {
@@ -88,7 +97,11 @@ public class AttemptController {
 
             if (optionalAttempt.isPresent()) {
                 return new ResponseEntity<>(
-                        new CreationAttemptResponse(optionalAttempt.get().getFeedback()),
+                        new CreationAttemptResponse(
+                                optionalAttempt.get().getFeedback().stream()
+                                    .map(FeedbackBallResponse::new)
+                                    .collect(Collectors.toList())
+                        ),
                         HttpStatus.OK
                 );
             }
@@ -105,7 +118,10 @@ public class AttemptController {
         } catch (GameNotFoundException e) {
             log.info("Error at getting the game with id: " + id, e);
             return buildErrorResponse(e.getMessage(), HttpStatus.NOT_FOUND);
-        } catch (WrongAttemptLengthException | ModelException e) {
+        } catch (GameIsOverException | GameIsSolvedException e) {
+            log.info("Error at getting the game with id: " + id, e);
+            return buildErrorResponse(e.getMessage(), HttpStatus.CONFLICT);
+        } catch (ModelException | WrongAttemptLengthException e) {
             log.info("Error at getting the game with id: " + id, e);
             return buildErrorResponse(e.getMessage(), HttpStatus.BAD_REQUEST);
         } catch (RepositoryException e) {

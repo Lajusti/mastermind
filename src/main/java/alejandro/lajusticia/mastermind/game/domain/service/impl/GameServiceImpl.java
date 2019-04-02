@@ -3,7 +3,7 @@ package alejandro.lajusticia.mastermind.game.domain.service.impl;
 import alejandro.lajusticia.mastermind.game.domain.model.Attempt;
 import alejandro.lajusticia.mastermind.game.domain.model.Game;
 import alejandro.lajusticia.mastermind.game.domain.model.GuessBall;
-import alejandro.lajusticia.mastermind.game.domain.model.exception.ModelException;
+import alejandro.lajusticia.mastermind.game.domain.model.exception.*;
 import alejandro.lajusticia.mastermind.game.domain.service.AttemptService;
 import alejandro.lajusticia.mastermind.game.domain.service.GameService;
 import alejandro.lajusticia.mastermind.game.domain.service.GuessBallService;
@@ -57,7 +57,9 @@ public class GameServiceImpl implements GameService {
     @Override
     @Transactional
     public Game addAttemptToGameByGameIdAndAttemptInput(String id, List<GuessBall> attemptInput)
-            throws ModelException, WrongAttemptLengthException, GameNotFoundException, RepositoryException {
+            throws WrongAttemptLengthException, GameNotFoundException, RepositoryException,
+            EmptyInputException, NullFeedbackException, GameIsSolvedException, GameIsOverException
+    {
         if (attemptInput.size() != SECRET_LENGTH) {
             throw new WrongAttemptLengthException(SECRET_LENGTH);
         }

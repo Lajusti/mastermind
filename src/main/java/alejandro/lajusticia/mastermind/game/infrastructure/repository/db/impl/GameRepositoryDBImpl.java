@@ -13,6 +13,7 @@ import alejandro.lajusticia.mastermind.game.infrastructure.repository.db.mapper.
 import alejandro.lajusticia.mastermind.game.infrastructure.repository.db.mapper.GameEntityDomainMapper;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import javax.persistence.EntityNotFoundException;
 import java.util.Optional;
@@ -33,11 +34,13 @@ public class GameRepositoryDBImpl implements GameRepository {
     }
 
     @Override
+    @Transactional
     public void saveGame(Game game) {
         gameJpaRepository.save(GameEntityDomainMapper.domainToEntity(game));
     }
 
     @Override
+    @Transactional
     public Optional<Game> findGameById(String id) throws GameUnavailableException {
         try {
             return Optional.of(GameEntityDomainMapper.entityToDomain(gameJpaRepository.getOne(id)));
@@ -65,6 +68,7 @@ public class GameRepositoryDBImpl implements GameRepository {
     }
 
     @Override
+    @Transactional
     public void saveAttemptToGame(Attempt attempt, Game game) {
         AttemptEntity entity = AttemptEntityDomainMapper.domainToEntity(attempt);
         entity.setGame(GameEntityDomainMapper.domainToEntity(game));

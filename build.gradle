@@ -45,6 +45,10 @@ test {
 	useJUnitPlatform()
 }
 
+functionalTest {
+	useJUnitPlatform()
+}
+
 jacoco {
 	toolVersion = "0.8.1"
 	reportsDir = file("$buildDir/jacocoReportDir")
@@ -61,7 +65,8 @@ jacocoTestReport {
 					exclude: [
 							'alejandro/lajusticia/mastermind/MastermindApplication**',
 							'alejandro/lajusticia/mastermind/config**',
-							'alejandro/lajusticia/mastermind/game/infrastructure/repository/db/entity**'
+							'alejandro/lajusticia/mastermind/game/infrastructure/repository/db/entity**',
+							'alejandro/lajusticia/mastermind/game/application/response**'
 					]
 			)
 		})

@@ -1,5 +1,6 @@
 package alejandro.lajusticia.mastermind.game.application.controller;
 
+import alejandro.lajusticia.mastermind.game.application.mapper.AttemptResponseMapper;
 import alejandro.lajusticia.mastermind.game.application.request.CreationGameRequest;
 import alejandro.lajusticia.mastermind.game.application.response.CreationGameResponse;
 import alejandro.lajusticia.mastermind.game.application.response.GetGameResponse;
@@ -18,6 +19,8 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
+
+import java.util.stream.Collectors;
 
 import static alejandro.lajusticia.mastermind.game.application.utils.ErrorResponseBuilder.buildErrorResponse;
 import static alejandro.lajusticia.mastermind.game.application.utils.ErrorResponseBuilder.buildUnnexpectedError;
@@ -70,7 +73,16 @@ public class GameController {
         try {
             Game game = gameService.getGame(id);
             return new ResponseEntity<>(
-                    new GetGameResponse(game.getUuid(), game.getMaxAttempts(), game.getAttempts()),
+                    new GetGameResponse(
+                            game.getUuid(),
+                            game.getMaxAttempts(),
+                            game.isSolved(),
+                            game.isEnded(),
+                            game.getAttempts().size(),
+                            game.getAttempts().stream()
+                                    .map(AttemptResponseMapper::domainToResponse)
+                                    .collect(Collectors.toList())
+                    ),
                     HttpStatus.OK
             );
         } catch (GameNotFoundException e) {

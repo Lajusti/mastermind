@@ -1,19 +1,20 @@
 package alejandro.lajusticia.mastermind.game.application.response;
 
-import alejandro.lajusticia.mastermind.game.domain.model.Attempt;
 import io.swagger.annotations.ApiModelProperty;
+import lombok.AllArgsConstructor;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
 
 import java.util.List;
 
 @Getter
+@Setter
+@AllArgsConstructor
+@NoArgsConstructor
 public class GetAttemptsResponse {
 
     @ApiModelProperty(notes = "List of the attempts")
-    private final List<Attempt> attempts;
-
-    public GetAttemptsResponse(List<Attempt> attempts) {
-        this.attempts = attempts;
-    }
+    private List<AttemptResponse> attempts;
 
 }
