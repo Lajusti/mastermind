@@ -41,7 +41,7 @@ El gameId se obtien como respuesta de la petición de creación de un juego
 
 ### [GET] localhost/games/{gameId}/attempts - Ver todos los intentos de un juego
 
-### [PUT] localhost/games/{gameId}/attempt - Realizar un intento
+### [PUT] localhost/games/{gameId}/attempts - Realizar un intento
 Ej body: 
 ```
 { "attempt": ["RED", "BLUE", "PURPLE", "RED"] }
